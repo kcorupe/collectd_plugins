@@ -1,7 +1,7 @@
 #!/bin/bash
 
 HOSTNAME="${COLLECTD_HOSTNAME:-localhost}"
-INTERVAL="${COLLECTD_INTERVAL:-5}"
+INTERVAL="${COLLECTD_INTERVAL:-60}"
 
 get_health_status(){
   HEALTH_STATUS=$(curl -silent http://localhost:9200/_cluster/health)
@@ -10,15 +10,15 @@ get_health_status(){
 get_color_status() {
   color_status=$(echo ${HEALTH_STATUS} | awk -F ',' '{print $2}' | awk -F ':' '{print $2}' | sed 's/"//g' )
   case $color_status in
-	red)
-	  color_code="2"
-	  ;;
-	yellow)
-	  color_code="1"
-	  ;;
-	green)
-	  color_code="0"
-	  ;;
+  red)
+    color_code="2"
+    ;;
+  yellow)
+    color_code="1"
+    ;;
+  green)
+    color_code="0"
+    ;;
   esac
 }
 
@@ -93,7 +93,8 @@ while sleep "$INTERVAL"; do
   echo "PUTVAL $HOSTNAME/exec-elasticsearch/gauge-relocating_shards interval=$INTERVAL N:$relocating_shards"
   echo "PUTVAL $HOSTNAME/exec-elasticsearch/gauge-initializing_shards interval=$INTERVAL N:$initializing_shards"
   echo "PUTVAL $HOSTNAME/exec-elasticsearch/gauge-unassigned_shards interval=$INTERVAL N:$unassigned_shards"
+  echo "PUTVAL $HOSTNAME/exec-elasticsearch/gauge-get_delayed_unassigned_shards interval=$INTERVAL N:$get_delayed_unassigned_shards"  
   echo "PUTVAL $HOSTNAME/exec-elasticsearch/gauge-number_of_pending_tasks interval=$INTERVAL N:$number_of_pending_tasks"
-
+  echo "PUTVAL $HOSTNAME/exec-elasticsearch/gauge-number_of_in_flight_fetch interval=$INTERVAL N:$number_of_in_flight_fetch"
 done
 
